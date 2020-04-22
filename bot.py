@@ -14,7 +14,7 @@ def random_string(length):
 
 
 def auth(username=credentials['username'], password=credentials['password']):
-    response = requests.post('http://127.0.0.1:5000/auth', json={"username": username, "password": password})
+    response = requests.post(f'{credentials["url"]}/auth', json={"username": username, "password": password})
 
     if response.status_code == 200:
 
@@ -30,7 +30,7 @@ def users_signup(number_of_users):
     users = [{"username": f'user_{random_string(4)}', "password": random_string(8)} for _ in range(number_of_users)]
     for user in users:
         access_token = auth()
-        response = requests.post('http://127.0.0.1:5000/register', headers={"Authorization": access_token}, json=user)
+        response = requests.post(f'{credentials["url"]}/register', headers={"Authorization": access_token}, json=user)
         if response.status_code != 201:
             print('Error on creating users')
             print(response.text)
@@ -41,11 +41,11 @@ def users_signup(number_of_users):
 
 def users_creating_random_posts(max_posts_per_user):
     access_token = auth()
-    users = requests.get('http://127.0.0.1:5000/users', headers={"Authorization": access_token})
+    users = requests.get(f'{credentials["url"]}/users', headers={"Authorization": access_token})
     for user in users.json():
         for i in range(random.randint(1, max_posts_per_user)):
             access_token = auth(username=user["username"], password=user["password"])
-            response = requests.post('http://127.0.0.1:5000/post', headers={"Authorization": access_token},
+            response = requests.post(f'{credentials["url"]}/post', headers={"Authorization": access_token},
                                      json={"text": random_string(20)})
             if response.status_code != 201:
                 print('Error on creating posts')
@@ -57,15 +57,15 @@ def users_creating_random_posts(max_posts_per_user):
 
 def like_random_posts(max_likes_per_user):
     access_token = auth()
-    users = requests.get('http://127.0.0.1:5000/users', headers={"Authorization": access_token})
+    users = requests.get(f'{credentials["url"]}/users', headers={"Authorization": access_token})
     access_token = auth()
-    posts = requests.get('http://127.0.0.1:5000/posts', headers={"Authorization": access_token})
+    posts = requests.get(f'{credentials["url"]}/posts', headers={"Authorization": access_token})
 
     for user in users.json():
         for i in range(random.randint(1, max_likes_per_user)):
             access_token = auth(username=user["username"], password=user["password"])
             response = requests.put(
-                f'http://127.0.0.1:5000/like/{random.choice([post["id"] for post in posts.json()])}',
+                f'{credentials["url"]}/like/{random.choice([post["id"] for post in posts.json()])}',
                 headers={"Authorization": access_token})
             if response.status_code not in (200, 201):
                 print('Error on liking posts')
