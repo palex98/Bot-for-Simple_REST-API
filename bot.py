@@ -8,10 +8,8 @@ with open('credentials.json', 'r', encoding='utf-8') as cred_file, \
     credentials = json.load(cred_file)
     config = json.load(config_file)
 
-
 def random_string(length):
     return ''.join(random.choice(string.ascii_letters) for _ in range(length))
-
 
 def auth(username=credentials['username'], password=credentials['password']):
     response = requests.post(f'{credentials["url"]}/auth', json={"username": username, "password": password})
@@ -24,7 +22,6 @@ def auth(username=credentials['username'], password=credentials['password']):
         print('Error on getting JWT token')
         print(response.status_code)
         return
-
 
 def users_signup(number_of_users):
     users = [{"username": f'user_{random_string(4)}', "password": random_string(8)} for _ in range(number_of_users)]
